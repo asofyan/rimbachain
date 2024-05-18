@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from blockchain import Blockchain
-from Crypto.PublicKey import RSA
+from wallet import generate_keys
 
 app = Flask(__name__)
 
@@ -14,17 +14,15 @@ def index():
 
 @app.route('/add_block', methods=['POST'])
 def add_block():
-    #print(request.form.get('miner_address'))
     miner_address = request.form.get('miner_address')
-    blockchain.add_block(transactions=["New Block"], miner_address=miner_address)
+    transactions = ["New Block"]
+    blockchain.add_block(transactions, miner_address)
     return redirect(url_for('index'))
 
 @app.route('/generate_keys', methods=['GET'])
-def generate_keys():
-    key = RSA.generate(2048)
-    private_key = key.export_key().decode('utf-8')
-    public_key = key.publickey().export_key().decode('utf-8')
-    return jsonify({'private_key': private_key, 'public_key': public_key})
+def generate_keys_route():
+    keys = generate_keys()
+    return jsonify(keys)
 
 @app.route('/get_balance', methods=['POST'])
 def get_balance():
@@ -33,5 +31,35 @@ def get_balance():
     balance = blockchain.get_balance(public_key)
     return jsonify({'balance': balance})
 
+@app.route('/synchronize', methods=['POST'])
+def synchronize():
+    data = request.get_json()
+    external_blocks = data.get('blocks', [])
+    for block_data in external_blocks:
+        block = Block(**block_data)
+        blockchain.chain.append(block)
+    return jsonify({"message": "Blockchain synchronized successfully"}), 200
+
+@app.route('/transfer_reward', methods=['POST'])
+def transfer_reward():
+    data = request.get_json()
+    from_address = blockchain.clean_address(data.get('from_address'))
+    to_address = blockchain.clean_address(data.get('to_address'))
+    amount = data.get('amount')
+
+    if blockchain.balances.get(from_address, 0) >= amount:
+        blockchain.balances[from_address] -= amount
+        if to_address in blockchain.balances:
+            blockchain.balances[to_address] += amount
+        else:
+            blockchain.balances[to_address] = amount
+        return jsonify({"message": "Transfer successful"}), 200
+    else:
+        return jsonify({"message": "Insufficient balance"}), 400
+
+@app.route('/wallet')
+def wallet():
+    return render_template('wallet.html')
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

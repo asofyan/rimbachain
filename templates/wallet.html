@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5dc; /* Earth tone background color */
+        }
+        .navbar {
+            background-color: #8b4513; /* SaddleBrown color */
+        }
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #ffffff; /* White text color */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">RimbaChain</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Back to Blockchain</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">Wallet</h1>
+        <p><strong>Wallet Address:</strong> <span id="walletAddress"></span></p>
+        <a href="#" id="toggleKeys">Detail Keys</a>
+        <div id="keyDetails" class="carousel slide mt-3" data-ride="carousel" style="display: none;">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <p><strong>Public Key:</strong> <span id="publicKey"></span></p>
+                </div>
+                <div class="carousel-item">
+                    <p><strong>Private Key:</strong> <span id="privateKey"></span></p>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#keyDetails" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#keyDetails" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Load wallet keys from local storage on page load
+        window.onload = () => {
+            const publicKey = localStorage.getItem('publicKey');
+            const privateKey = localStorage.getItem('privateKey');
+            const walletAddress = localStorage.getItem('walletAddress');
+            if (publicKey && privateKey && walletAddress) {
+                document.getElementById('publicKey').textContent = publicKey;
+                document.getElementById('privateKey').textContent = privateKey;
+                document.getElementById('walletAddress').textContent = walletAddress;
+            }
+        };
+
+        // Toggle key details display
+        document.getElementById('toggleKeys').addEventListener('click', function(event) {
+            event.preventDefault();
+            const keyDetails = document.getElementById('keyDetails');
+            if (keyDetails.style.display === 'none') {
+                keyDetails.style.display = 'block';
+            } else {
+                keyDetails.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

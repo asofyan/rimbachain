@@ -3,6 +3,9 @@ import json
 import time
 import math
 from collections import deque
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 class MerkleTree:
     def __init__(self, transactions):
@@ -141,14 +144,59 @@ class Blockchain:
         for block in self.chain:
             print(json.dumps(block.to_dict(), indent=4))
 
+blockchain = Blockchain()
+
+@app.route('/add_block', methods=['POST'])
+def add_block():
+    data = request.get_json()
+    transactions = data.get('transactions', [])
+    miner_address = data.get('miner_address', 'unknown')
+    blockchain.add_block(transactions, miner_address)
+    return jsonify({"message": "Block added successfully"}), 201
+
+@app.route('/get_blocks', methods=['GET'])
+def get_blocks():
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 10, type=int)
+    blocks, total_pages = blockchain.get_blocks_paginated(page, page_size)
+    return jsonify({
+        "blocks": [block.to_dict() for block in blocks],
+        "total_pages": total_pages,
+        "current_page": page
+    })
+
+@app.route('/get_balance', methods=['POST'])
+def get_balance():
+    data = request.get_json()
+    public_key = data.get('public_key')
+    balance = blockchain.get_balance(public_key)
+    return jsonify({'balance': balance})
+
+@app.route('/synchronize', methods=['POST'])
+def synchronize():
+    data = request.get_json()
+    external_blocks = data.get('blocks', [])
+    for block_data in external_blocks:
+        block = Block(**block_data)
+        blockchain.chain.append(block)
+    return jsonify({"message": "Blockchain synchronized successfully"}), 200
+
+@app.route('/transfer_reward', methods=['POST'])
+def transfer_reward():
+    data = request.get_json()
+    from_address = blockchain.clean_address(data.get('from_address'))
+    to_address = blockchain.clean_address(data.get('to_address'))
+    amount = data.get('amount')
+
+    if blockchain.balances.get(from_address, 0) >= amount:
+        blockchain.balances[from_address] -= amount
+        if to_address in blockchain.balances:
+            blockchain.balances[to_address] += amount
+        else:
+            blockchain.balances[to_address] = amount
+        return jsonify({"message": "Transfer successful"}), 200
+    else:
+        return jsonify({"message": "Insufficient balance"}), 400
+
 if __name__ == "__main__":
-    blockchain = Blockchain()
-
-    blockchain.add_block(["First block after genesis"], miner_address="miner1")
-    blockchain.add_block(["Second block after genesis"], miner_address="miner2")
-    blockchain.add_block(["Third block after genesis"], miner_address="miner1")
-
-    blockchain.print_chain()
-
-    print("Is blockchain valid?", blockchain.is_chain_valid())
-    print("Balances:", blockchain.balances)
+    app.run(debug=True, port=5000)

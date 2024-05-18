@@ -4,92 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RimbaChain</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            background-color: #f5f5dc; /* Earth tone background color */
         }
-        table, th, td {
-            border: 1px solid black;
+        .navbar {
+            background-color: #8b4513; /* SaddleBrown color */
         }
-        th, td {
-            padding: 8px;
-            text-align: left;
+        .navbar-brand, .navbar-nav .nav-link {
+            color: #ffffff; /* White text color */
         }
-        th {
-            background-color: #f2f2f2;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .pagination a {
-            margin: 0 5px;
-            padding: 8px 16px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            color: #007bff;
-        }
-        .pagination a.active {
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-        }
-        .pagination a:hover:not(.active) {
-            background-color: #ddd;
-        }
-        #wallet {
-            margin-top: 20px;
+        .dropdown-menu {
+            background-color: #f5f5dc; /* Earth tone dropdown menu */
         }
     </style>
 </head>
 <body>
-    <h1>RimbaChain</h1>
-    <form id="mineForm" action="/add_block" method="post">
-        <button type="submit">Add Block</button>
-        <input type="hidden" name="miner_address" id="minerAddress">
-    </form>
-    <h2>Mined Blocks</h2>
-    <table>
-        <tr>
-            <th>Index</th>
-            <th>Previous Hash</th>
-            <th>Timestamp</th>
-            <th>Transactions</th>
-            <th>Nonce</th>
-            <th>Merkle Root</th>
-            <th>Hash</th>
-            <th>Reward</th>
-            <th>Miner Address</th>
-        </tr>
-        {% for block in blocks %}
-        <tr>
-            <td>{{ block.index }}</td>
-            <td>{{ block.previous_hash }}</td>
-            <td>{{ block.timestamp }}</td>
-            <td>{{ block.transactions }}</td>
-            <td>{{ block.nonce }}</td>
-            <td>{{ block.merkle_root }}</td>
-            <td>{{ block.hash }}</td>
-            <td>{{ block.reward }}</td>
-            <td>{{ block.miner_address }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <div class="pagination">
-        {% for p in range(1, total_pages + 1) %}
-        <a href="/?page={{ p }}" class="{{ 'active' if p == page else '' }}">{{ p }}</a>
-        {% endfor %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">RimbaChain</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Balance: <span id="balanceValue">0</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profileMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Profile
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenu">
+                        <a class="dropdown-item" href="/wallet" id="walletLink">Wallet</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">Mined Blocks</h1>
+        <form id="mineForm" action="/add_block" method="post">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Add Block</button>
+                <input type="hidden" name="miner_address" id="minerAddress">
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Index</th>
+                        <th>Previous Hash</th>
+                        <th>Timestamp</th>
+                        <th>Transactions</th>
+                        <th>Nonce</th>
+                        <th>Merkle Root</th>
+                        <th>Hash</th>
+                        <th>Reward</th>
+                        <th>Miner Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for block in blocks %}
+                    <tr>
+                        <td>{{ block.index }}</td>
+                        <td>{{ block.previous_hash }}</td>
+                        <td>{{ block.timestamp }}</td>
+                        <td>{{ block.transactions }}</td>
+                        <td>{{ block.nonce }}</td>
+                        <td>{{ block.merkle_root }}</td>
+                        <td>{{ block.hash }}</td>
+                        <td>{{ block.reward }}</td>
+                        <td>{{ block.miner_address }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination">
+                {% for p in range(1, total_pages + 1) %}
+                <li class="page-item {{ 'active' if p == page else '' }}">
+                    <a class="page-link" href="/?page={{ p }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
     </div>
-    
-    <div id="wallet">
-        <h2>Wallet</h2>
-        <button onclick="generateWallet()">Generate Wallet</button>
-        <p id="publicKey"></p>
-        <p id="privateKey"></p>
-        <p id="balance">Balance: 0</p>
-    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         function generateWallet() {
@@ -98,8 +106,7 @@
                 .then(data => {
                     localStorage.setItem('publicKey', data.public_key);
                     localStorage.setItem('privateKey', data.private_key);
-                    document.getElementById('publicKey').textContent = `Public Key: ${data.public_key}`;
-                    document.getElementById('privateKey').textContent = `Private Key: ${data.private_key}`;
+                    localStorage.setItem('walletAddress', data.address);
                     updateBalance(data.public_key);
                 });
         }
@@ -114,7 +121,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('balance').textContent = `Balance: ${data.balance}`;
+                document.getElementById('balanceValue').textContent = `${data.balance}`;
             });
         }
 
@@ -123,8 +130,6 @@
             const publicKey = localStorage.getItem('publicKey');
             const privateKey = localStorage.getItem('privateKey');
             if (publicKey && privateKey) {
-                document.getElementById('publicKey').textContent = `Public Key: ${publicKey}`;
-                document.getElementById('privateKey').textContent = `Private Key: ${privateKey}`;
                 updateBalance(publicKey);
                 document.getElementById('minerAddress').value = publicKey;
             }
