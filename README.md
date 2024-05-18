@@ -1,4 +1,5 @@
 **RimbaChain**
+---
 Simple Python implementation of blockchain
 
 Features
