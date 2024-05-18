@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RimbaChain</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #007bff;
+        }
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+        #wallet {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>RimbaChain</h1>
+    <form id="mineForm" action="/add_block" method="post">
+        <button type="submit">Add Block</button>
+        <input type="hidden" name="miner_address" id="minerAddress">
+    </form>
+    <h2>Mined Blocks</h2>
+    <table>
+        <tr>
+            <th>Index</th>
+            <th>Previous Hash</th>
+            <th>Timestamp</th>
+            <th>Transactions</th>
+            <th>Nonce</th>
+            <th>Merkle Root</th>
+            <th>Hash</th>
+            <th>Reward</th>
+            <th>Miner Address</th>
+        </tr>
+        {% for block in blocks %}
+        <tr>
+            <td>{{ block.index }}</td>
+            <td>{{ block.previous_hash }}</td>
+            <td>{{ block.timestamp }}</td>
+            <td>{{ block.transactions }}</td>
+            <td>{{ block.nonce }}</td>
+            <td>{{ block.merkle_root }}</td>
+            <td>{{ block.hash }}</td>
+            <td>{{ block.reward }}</td>
+            <td>{{ block.miner_address }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="pagination">
+        {% for p in range(1, total_pages + 1) %}
+        <a href="/?page={{ p }}" class="{{ 'active' if p == page else '' }}">{{ p }}</a>
+        {% endfor %}
+    </div>
+    
+    <div id="wallet">
+        <h2>Wallet</h2>
+        <button onclick="generateWallet()">Generate Wallet</button>
+        <p id="publicKey"></p>
+        <p id="privateKey"></p>
+        <p id="balance">Balance: 0</p>
+    </div>
+
+    <script>
+        function generateWallet() {
+            fetch('/generate_keys')
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem('publicKey', data.public_key);
+                    localStorage.setItem('privateKey', data.private_key);
+                    document.getElementById('publicKey').textContent = `Public Key: ${data.public_key}`;
+                    document.getElementById('privateKey').textContent = `Private Key: ${data.private_key}`;
+                    updateBalance(data.public_key);
+                });
+        }
+
+        function updateBalance(publicKey) {
+            fetch('/get_balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ public_key: publicKey })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('balance').textContent = `Balance: ${data.balance}`;
+            });
+        }
+
+        // Load wallet from local storage on page load
+        window.onload = () => {
+            const publicKey = localStorage.getItem('publicKey');
+            const privateKey = localStorage.getItem('privateKey');
+            if (publicKey && privateKey) {
+                document.getElementById('publicKey').textContent = `Public Key: ${publicKey}`;
+                document.getElementById('privateKey').textContent = `Private Key: ${privateKey}`;
+                updateBalance(publicKey);
+                document.getElementById('minerAddress').value = publicKey;
+            }
+        };
+
+        document.getElementById('mineForm').addEventListener('submit', function() {
+            const publicKey = localStorage.getItem('publicKey');
+            if (publicKey) {
+                document.getElementById('minerAddress').value = publicKey;
+                setTimeout(() => updateBalance(publicKey), 1000); // Update balance after mining
+            }
+        });
+    </script>
+</body>
+</html>
