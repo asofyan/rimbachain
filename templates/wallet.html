@@ -3,86 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Wallet | RimbaChain</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2E7D32; /* Forest Green */
+            --secondary-color: #81C784; /* Light Green */
+            --accent-color: #FFC107; /* Amber */
+            --background-color: #F1F8E9; /* Light Green/Off-white */
+            --dark-color: #1B5E20; /* Dark Green */
+            --text-color: #212121; /* Almost Black */
+            --light-text: #FAFAFA; /* Off-white */
+            --danger-color: #D32F2F; /* Red */
+            --warning-color: #FF9800; /* Orange */
+        }
+        
         body {
-            background-color: #f5f5dc; /* Earth tone background color */
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
         }
+        
         .navbar {
-            background-color: #8b4513; /* SaddleBrown color */
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .navbar-brand, .navbar-nav .nav-link {
-            color: #ffffff; /* White text color */
+        
+        .navbar-brand, .nav-link {
+            color: var(--light-text) !important;
+            font-weight: 500;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            font-weight: 600;
+            padding: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+            border-color: var(--dark-color);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--light-text);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .key-section {
+            background-color: rgba(46, 125, 50, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+        }
+        
+        .badge-balance {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        
+        #transactionStatus {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            padding: 1rem;
+        }
+        
+        .list-group-item:first-child {
+            border-top: none;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(129, 199, 132, 0.25);
+        }
+        
+        /* Animation for transaction list */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .list-group-item {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        /* Additional responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">RimbaChain</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Back to Blockchain</a>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-leaf"></i> RimbaChain</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Blockchain</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-    <div class="container mt-4">
-        <h1 class="mb-4">Wallet</h1>
-        <p><strong>Wallet Address:</strong> <span id="walletAddress"></span></p>
-        <a href="#" id="toggleKeys">Detail Keys</a>
-        <div id="keyDetails" class="carousel slide mt-3" data-ride="carousel" style="display: none;">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <p><strong>Public Key:</strong> <span id="publicKey"></span></p>
-                </div>
-                <div class="carousel-item">
-                    <p><strong>Private Key:</strong> <span id="privateKey"></span></p>
+    
+    <div class="container py-4">
+        <h1 class="mb-4 d-flex align-items-center">
+            <i class="fas fa-wallet me-3 text-primary"></i>
+            Your Wallet
+        </h1>
+        
+        <!-- No Wallet Section -->
+        <div id="noWalletSection" style="display: none;">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-wallet fa-4x mb-3 text-muted"></i>
+                    <h3 class="mb-3">No Wallet Found</h3>
+                    <p class="mb-4">You don't have a wallet yet. Create one to start using RimbaChain.</p>
+                    <button id="generateWalletBtn" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i> Generate New Wallet
+                    </button>
                 </div>
             </div>
-            <a class="carousel-control-prev" href="#keyDetails" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#keyDetails" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
+        </div>
+        
+        <!-- Wallet Section -->
+        <div id="walletSection" style="display: none;">
+            <div class="row">
+                <!-- Wallet Info Card -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> Wallet Information</h5>
+                            <span class="badge badge-balance"><i class="fas fa-coins me-1"></i> Balance: <span id="walletBalance">0</span></span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">Your Wallet Address</h6>
+                                <div class="wallet-address mb-2" id="walletAddress"></div>
+                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-clipboard-target="#walletAddress">
+                                    <i class="fas fa-copy me-1"></i> Copy
+                                </button>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <a href="#" id="toggleKeys" class="btn btn-outline-primary d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-key me-2"></i> <span id="toggleKeysText">Show Keys</span>
+                                </a>
+                            </div>
+                            
+                            <div id="keyDetails" class="mt-3" style="display: none;">
+                                <div class="key-section mb-3">
+                                    <h6 class="text-muted mb-2">Public Key</h6>
+                                    <div class="text-break" id="publicKey"></div>
+                                </div>
+                                
+                                <div class="key-section mb-3">
+                                    <h6 class="text-muted mb-2">Private Key</h6>
+                                    <div class="text-break" id="privateKey"></div>
+                                    <div class="alert alert-warning mt-2" role="alert">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Warning:</strong> Never share your private key. Anyone with access can control your wallet.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button id="regenerateWalletBtn" class="btn btn-outline-danger">
+                                    <i class="fas fa-sync-alt me-2"></i> Regenerate Wallet
+                                </button>
+                                <div id="regenWarning" class="alert alert-danger mt-3" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Caution:</strong> Regenerating will overwrite your current wallet and keys. This action cannot be undone.
+                                    <div class="mt-3">
+                                        <button id="confirmRegenBtn" class="btn btn-danger me-2">
+                                            <i class="fas fa-check me-1"></i> Yes, Regenerate
+                                        </button>
+                                        <button id="cancelRegenBtn" class="btn btn-secondary">
+                                            <i class="fas fa-times me-1"></i> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Send Transaction Card -->
+                <div class="col-lg-6 mb-4" id="transactionSection" style="display: none;">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i> Send Transaction</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="sendTransactionForm" class="mb-3">
+                                <div class="mb-3">
+                                    <label for="recipientAddress" class="form-label">Recipient Address</label>
+                                    <input type="text" class="form-control" id="recipientAddress" placeholder="Enter recipient wallet address" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">Amount</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="amount" min="1" placeholder="Amount to send" required>
+                                        <span class="input-group-text">RC</span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-paper-plane me-2"></i> Send Transaction
+                                </button>
+                            </form>
+                            <div id="transactionStatus"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Transactions Card -->
+            <div id="pendingTransactionsSection" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2"></i> Pending Transactions</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul id="pendingTransactionsList" class="list-group list-group-flush"></ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Optional: Clipboard.js for copy functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
 
     <script>
-        // Load wallet keys from local storage on page load
-        window.onload = () => {
+        // Function to fetch the wallet balance
+        async function fetchWalletBalance(address) {
+            try {
+                const response = await fetch(`/api/wallet_balance/${address}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('walletBalance').textContent = data.balance;
+                } else {
+                    console.error('Failed to fetch wallet balance');
+                }
+            } catch (error) {
+                console.error('Error fetching wallet balance:', error);
+            }
+        }
+
+        // Setup periodic balance refresh
+        let balanceRefreshInterval;
+
+        function setupBalanceRefresh(address) {
+            // Clear any existing interval
+            if (balanceRefreshInterval) {
+                clearInterval(balanceRefreshInterval);
+            }
+            
+            // Fetch balance immediately and then every 5 seconds
+            fetchWalletBalance(address);
+            balanceRefreshInterval = setInterval(() => {
+                fetchWalletBalance(address);
+            }, 5000);
+        }
+
+        function showWalletSection(keys) {
+            document.getElementById('walletSection').style.display = 'block';
+            document.getElementById('noWalletSection').style.display = 'none';
+            document.getElementById('publicKey').textContent = keys.publicKey || keys.public_key;
+            document.getElementById('privateKey').textContent = keys.privateKey || keys.private_key;
+            const walletAddress = keys.walletAddress || keys.address;
+            document.getElementById('walletAddress').textContent = walletAddress;
+            
+            // Set up periodic balance refresh
+            setupBalanceRefresh(walletAddress);
+            
+            // Also show transaction sections
+            showTransactionSection();
+        }
+
+        function showNoWalletSection() {
+            document.getElementById('walletSection').style.display = 'none';
+            document.getElementById('noWalletSection').style.display = 'block';
+        }
+
+        function loadWalletFromStorage() {
             const publicKey = localStorage.getItem('publicKey');
             const privateKey = localStorage.getItem('privateKey');
             const walletAddress = localStorage.getItem('walletAddress');
             if (publicKey && privateKey && walletAddress) {
-                document.getElementById('publicKey').textContent = publicKey;
-                document.getElementById('privateKey').textContent = privateKey;
-                document.getElementById('walletAddress').textContent = walletAddress;
+                showWalletSection({
+                    publicKey,
+                    privateKey,
+                    walletAddress
+                });
+            } else {
+                showNoWalletSection();
             }
+        }
+
+        // Initialize clipboard functionality
+        function initClipboard() {
+            if (typeof ClipboardJS !== 'undefined') {
+                new ClipboardJS('.copy-btn');
+                
+                // Add tooltip functionality or feedback for copy action
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-check me-1"></i> Copied!';
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                        }, 2000);
+                    });
+                });
+            }
+        }
+
+        window.onload = function() {
+            loadWalletFromStorage();
+            initClipboard();
         };
 
-        // Toggle key details display
-        document.getElementById('toggleKeys').addEventListener('click', function(event) {
-            event.preventDefault();
-            const keyDetails = document.getElementById('keyDetails');
-            if (keyDetails.style.display === 'none') {
-                keyDetails.style.display = 'block';
-            } else {
-                keyDetails.style.display = 'none';
+        // Generate Wallet
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generateWalletBtn');
+            if (generateBtn) {
+                generateBtn.addEventListener('click', async function() {
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Generating...';
+                    
+                    try {
+                        const response = await fetch('/api/generate_wallet', { method: 'POST' });
+                        if (response.ok) {
+                            const data = await response.json();
+                            localStorage.setItem('publicKey', data.public_key);
+                            localStorage.setItem('privateKey', data.private_key);
+                            localStorage.setItem('walletAddress', data.address);
+                            showWalletSection({
+                                publicKey: data.public_key,
+                                privateKey: data.private_key,
+                                walletAddress: data.address
+                            });
+                        } else {
+                            alert('Failed to generate wallet. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error generating wallet:', error);
+                        alert('An error occurred while generating your wallet.');
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Generate New Wallet';
+                    }
+                });
             }
+
+            // Toggle key details
+            const toggleKeys = document.getElementById('toggleKeys');
+            if (toggleKeys) {
+                toggleKeys.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const keyDetails = document.getElementById('keyDetails');
+                    const toggleText = document.getElementById('toggleKeysText');
+                    
+                    if (keyDetails.style.display === 'none') {
+                        keyDetails.style.display = 'block';
+                        toggleText.textContent = 'Hide Keys';
+                    } else {
+                        keyDetails.style.display = 'none';
+                        toggleText.textContent = 'Show Keys';
+                    }
+                });
+            }
+
+            // Regenerate Wallet
+            const regenBtn = document.getElementById('regenerateWalletBtn');
+            const regenWarning = document.getElementById('regenWarning');
+            if (regenBtn) {
+                regenBtn.addEventListener('click', function() {
+                    regenWarning.style.display = 'block';
+                });
+            }
+            const confirmRegenBtn = document.getElementById('confirmRegenBtn');
+            const cancelRegenBtn = document.getElementById('cancelRegenBtn');
+            if (confirmRegenBtn) {
+                confirmRegenBtn.addEventListener('click', async function() {
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Regenerating...';
+                    
+                    try {
+                        const response = await fetch('/api/generate_wallet', { method: 'POST' });
+                        if (response.ok) {
+                            const data = await response.json();
+                            localStorage.setItem('publicKey', data.public_key);
+                            localStorage.setItem('privateKey', data.private_key);
+                            localStorage.setItem('walletAddress', data.address);
+                            showWalletSection({
+                                publicKey: data.public_key,
+                                privateKey: data.private_key,
+                                walletAddress: data.address
+                            });
+                            regenWarning.style.display = 'none';
+                        } else {
+                            alert('Failed to regenerate wallet. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error regenerating wallet:', error);
+                        alert('An error occurred while regenerating your wallet.');
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-check me-1"></i> Yes, Regenerate';
+                    }
+                });
+            }
+            if (cancelRegenBtn) {
+                cancelRegenBtn.addEventListener('click', function() {
+                    regenWarning.style.display = 'none';
+                });
+            }
+        });
+        
+        // Transaction system integration
+        function showTransactionSection() {
+            document.getElementById('transactionSection').style.display = 'block';
+            document.getElementById('pendingTransactionsSection').style.display = 'block';
+            fetchPendingTransactions();
+        }
+
+        async function fetchPendingTransactions() {
+            const list = document.getElementById('pendingTransactionsList');
+            list.innerHTML = '<li class="list-group-item text-center"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading transactions...</li>';
+            
+            try {
+                const res = await fetch('/api/pending_transactions');
+                if (res.ok) {
+                    const txs = await res.json();
+                    list.innerHTML = '';
+                    
+                    if (txs.length === 0) {
+                        list.innerHTML = '<li class="list-group-item text-center text-muted"><i class="fas fa-info-circle me-2"></i> No pending transactions</li>';
+                    } else {
+                        txs.forEach((tx, index) => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            li.style.animationDelay = `${index * 0.1}s`;
+                            
+                            // Create a more structured transaction item
+                            li.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mb-1">
+                                            <span class="badge bg-secondary me-2">From</span>
+                                            <span class="text-truncate">${tx.sender.substring(0, 16)}...</span>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-success me-2">To</span>
+                                            <span class="text-truncate">${tx.recipient.substring(0, 16)}...</span>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">${tx.amount} RC</span>
+                                </div>
+                            `;
+                            list.appendChild(li);
+                        });
+                    }
+                } else {
+                    list.innerHTML = '<li class="list-group-item text-center text-danger"><i class="fas fa-exclamation-circle me-2"></i> Failed to load pending transactions</li>';
+                }
+            } catch (e) {
+                list.innerHTML = '<li class="list-group-item text-center text-danger"><i class="fas fa-exclamation-circle me-2"></i> Error loading pending transactions</li>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show transaction and pending sections if wallet exists
+            if (localStorage.getItem('walletAddress')) {
+                showTransactionSection();
+            }
+
+            // Handle send transaction form
+            const sendForm = document.getElementById('sendTransactionForm');
+            if (sendForm) {
+                sendForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...';
+                    
+                    const recipient = document.getElementById('recipientAddress').value.trim();
+                    const amount = parseInt(document.getElementById('amount').value, 10);
+                    const sender = localStorage.getItem('walletAddress');
+                    const privateKey = localStorage.getItem('privateKey');
+                    const statusDiv = document.getElementById('transactionStatus');
+                    statusDiv.textContent = '';
+                    statusDiv.className = '';
+                    
+                    if (!recipient || !amount || !privateKey || !sender) {
+                        statusDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i> Missing required fields or wallet not loaded.</div>';
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Transaction';
+                        return;
+                    }
+                    
+                    try {
+                        const timestamp = Date.now();
+                        const publicKey = localStorage.getItem('publicKey');
+                        const privateKey = localStorage.getItem('privateKey');
+                        const sender = localStorage.getItem('walletAddress');
+                        const recipient = document.getElementById('recipientAddress').value.trim();
+                        const amount = parseInt(document.getElementById('amount').value, 10);
+                        
+                        // Sign the transaction using our API
+                        const signResponse = await fetch('/api/sign_transaction', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sender,
+                                recipient,
+                                amount,
+                                timestamp,
+                                private_key: privateKey
+                            })
+                        });
+                        
+                        if (!signResponse.ok) {
+                            const error = await signResponse.json();
+                            throw new Error(error.message || "Failed to sign transaction");
+                        }
+                        
+                        const { signature } = await signResponse.json();
+                        
+                        // Send the transaction with all required fields
+                        const res = await fetch('/api/send_transaction', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sender,
+                                recipient,
+                                amount,
+                                timestamp,
+                                public_key: publicKey,
+                                signature
+                            })
+                        });
+                        
+                        if (res.ok) {
+                            statusDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> Transaction submitted successfully.</div>';
+                            fetchPendingTransactions();
+                            sendForm.reset();
+                        } else {
+                            const err = await res.text();
+                            statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i> Failed to submit transaction: ${err}</div>`;
+                        }
+                    } catch (err) {
+                        statusDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i> Error submitting transaction.</div>';
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Transaction';
+                    }
+                });
+            }
+            
+            // Start periodic refresh of pending transactions
+            setInterval(fetchPendingTransactions, 10000);
         });
     </script>
 </body>

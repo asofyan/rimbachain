@@ -4,144 +4,429 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RimbaChain</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2E7D32; /* Forest Green */
+            --secondary-color: #81C784; /* Light Green */
+            --accent-color: #FFC107; /* Amber */
+            --background-color: #F1F8E9; /* Light Green/Off-white */
+            --dark-color: #1B5E20; /* Dark Green */
+            --text-color: #212121; /* Almost Black */
+            --light-text: #FAFAFA; /* Off-white */
+            --danger-color: #D32F2F; /* Red */
+            --warning-color: #FF9800; /* Orange */
+        }
+        
         body {
-            background-color: #f5f5dc; /* Earth tone background color */
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
         }
+        
         .navbar {
-            background-color: #8b4513; /* SaddleBrown color */
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .navbar-brand, .navbar-nav .nav-link {
-            color: #ffffff; /* White text color */
+        
+        .navbar-brand, .nav-link {
+            color: var(--light-text) !important;
+            font-weight: 500;
         }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+        
         .dropdown-menu {
-            background-color: #f5f5dc; /* Earth tone dropdown menu */
+            background-color: var(--background-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .dropdown-item {
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(46, 125, 50, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .balance-badge {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            font-weight: 600;
+            border-radius: 20px;
+            padding: 0.35rem 0.75rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+            border-color: var(--dark-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: rgba(129, 199, 132, 0.08);
+        }
+        
+        .thead-dark {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+        }
+        
+        .thead-dark th {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            font-weight: 500;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+        
+        .main-heading {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .main-heading i {
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+        
+        .main-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        /* Hash and technical columns styling */
+        .hash-data {
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+            white-space: nowrap;
+        }
+        
+        /* Animation for new blocks */
+        @keyframes highlight {
+            0% { background-color: rgba(255, 193, 7, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        .new-block {
+            animation: highlight 2s ease-out;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .hash-data {
+                max-width: 100px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .table-responsive {
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            
+            .hash-data {
+                max-width: 80px;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">RimbaChain</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Balance: <span id="balanceValue">0</span></a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="profileMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Profile
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileMenu">
-                        <a class="dropdown-item" href="/wallet" id="walletLink">Wallet</a>
-                    </div>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-leaf"></i> RimbaChain</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item me-3">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <i class="fas fa-coins me-2"></i> Balance: 
+                            <span id="balanceValue" class="balance-badge ms-2">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-2"></i> Profile
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileMenu">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="/wallet" id="walletLink">
+                                    <i class="fas fa-wallet me-2"></i> Wallet
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
-    <div class="container mt-4">
-        <h1 class="mb-4">Mined Blocks</h1>
-        <form id="mineForm" action="/add_block" method="post">
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Add Block</button>
-                <input type="hidden" name="miner_address" id="minerAddress">
+    
+    <div class="container py-4">
+        <h1 class="main-heading mb-4">
+            <i class="fas fa-cubes"></i> Blockchain Explorer
+        </h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <h5 class="card-title mb-0">Mining Dashboard</h5>
+                        <p class="text-muted">Mine new blocks and earn rewards</p>
+                    </div>
+                    <form id="mineForm" action="/add_block" method="post" class="d-flex">
+                        <input type="hidden" name="miner_address" id="minerAddress">
+                        <button type="submit" class="btn btn-primary d-flex align-items-center">
+                            <i class="fas fa-hammer me-2"></i> Mine New Block
+                        </button>
+                    </form>
+                </div>
             </div>
-        </form>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Index</th>
-                        <th>Previous Hash</th>
-                        <th>Timestamp</th>
-                        <th>Transactions</th>
-                        <th>Nonce</th>
-                        <th>Merkle Root</th>
-                        <th>Hash</th>
-                        <th>Reward</th>
-                        <th>Miner Address</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for block in blocks %}
-                    <tr>
-                        <td>{{ block.index }}</td>
-                        <td>{{ block.previous_hash }}</td>
-                        <td>{{ block.timestamp }}</td>
-                        <td>{{ block.transactions }}</td>
-                        <td>{{ block.nonce }}</td>
-                        <td>{{ block.merkle_root }}</td>
-                        <td>{{ block.hash }}</td>
-                        <td>{{ block.reward }}</td>
-                        <td>{{ block.miner_address }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
-        <nav>
-            <ul class="pagination">
-                {% for p in range(1, total_pages + 1) %}
-                <li class="page-item {{ 'active' if p == page else '' }}">
-                    <a class="page-link" href="/?page={{ p }}">{{ p }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-        </nav>
+        
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2 text-primary"></i> Block History
+                </h5>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-filter text-muted me-2"></i>
+                    <select class="form-select form-select-sm" id="blockFilter" style="width: auto;">
+                        <option value="all" selected>All Blocks</option>
+                        <option value="mined">My Mined Blocks</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Index</th>
+                                <th scope="col">Previous Hash</th>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Transactions</th>
+                                <th scope="col">Nonce</th>
+                                <th scope="col">Merkle Root</th>
+                                <th scope="col">Hash</th>
+                                <th scope="col">Reward</th>
+                                <th scope="col">Miner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for block in blocks %}
+                            <tr class="block-row" data-miner="{{ block.miner_address }}">
+                                <td>{{ block.index }}</td>
+                                <td class="hash-data" title="{{ block.previous_hash }}">{{ block.previous_hash }}</td>
+                                <td>{{ block.timestamp }}</td>
+                                <td>{{ block.transactions }}</td>
+                                <td>{{ block.nonce }}</td>
+                                <td class="hash-data" title="{{ block.merkle_root }}">{{ block.merkle_root }}</td>
+                                <td class="hash-data" title="{{ block.hash }}">{{ block.hash }}</td>
+                                <td><span class="badge bg-success">{{ block.reward }}</span></td>
+                                <td class="hash-data" title="{{ block.miner_address }}">{{ block.miner_address }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        {% for p in range(1, total_pages + 1) %}
+                        <li class="page-item {{ 'active' if p == page else '' }}">
+                            <a class="page-link" href="/?page={{ p }}">{{ p }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap 5 JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function generateWallet() {
-            fetch('/generate_keys')
-                .then(response => response.json())
-                .then(data => {
+        // Generate wallet if not exists
+        async function generateWallet() {
+            try {
+                const response = await fetch('/api/generate_wallet', { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
                     localStorage.setItem('publicKey', data.public_key);
                     localStorage.setItem('privateKey', data.private_key);
                     localStorage.setItem('walletAddress', data.address);
-                    updateBalance(data.public_key);
-                });
+                    updateMinerAddress(data.address);
+                    updateBalance(data.address);
+                }
+            } catch (error) {
+                console.error('Error generating wallet:', error);
+            }
         }
 
-        function updateBalance(publicKey) {
-            fetch('/get_balance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ public_key: publicKey })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('balanceValue').textContent = `${data.balance}`;
-            });
+        function updateMinerAddress(address) {
+            document.getElementById('minerAddress').value = address;
+        }
+
+        async function updateBalance(address) {
+            try {
+                const response = await fetch(`/api/wallet_balance/${address}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('balanceValue').textContent = data.balance;
+                }
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+            }
         }
 
         // Load wallet from local storage on page load
         window.onload = () => {
-            const publicKey = localStorage.getItem('publicKey');
-            const privateKey = localStorage.getItem('privateKey');
-            if (publicKey && privateKey) {
-                updateBalance(publicKey);
-                document.getElementById('minerAddress').value = publicKey;
+            const walletAddress = localStorage.getItem('walletAddress');
+            if (walletAddress) {
+                updateMinerAddress(walletAddress);
+                updateBalance(walletAddress);
+            } else {
+                generateWallet();
             }
+            
+            // Setup block filter functionality
+            setupBlockFilter();
         };
 
-        document.getElementById('mineForm').addEventListener('submit', function() {
-            const publicKey = localStorage.getItem('publicKey');
-            if (publicKey) {
-                document.getElementById('minerAddress').value = publicKey;
-                setTimeout(() => updateBalance(publicKey), 1000); // Update balance after mining
+        // Setup mining form submission
+        document.getElementById('mineForm').addEventListener('submit', function(e) {
+            const walletAddress = localStorage.getItem('walletAddress');
+            if (!walletAddress) {
+                e.preventDefault();
+                generateWallet();
+                alert('Please try mining again after your wallet is generated.');
+            } else {
+                updateMinerAddress(walletAddress);
+                
+                // Visual feedback when mining starts
+                const btn = this.querySelector('button');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mining...';
+                
+                // Set a timeout to revert the button state in case the page doesn't refresh
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 5000);
+                
+                // Update balance after mining (for visual consistency)
+                setTimeout(() => updateBalance(walletAddress), 5000);
             }
         });
+
+        // Block filtering functionality
+        function setupBlockFilter() {
+            const filter = document.getElementById('blockFilter');
+            if (filter) {
+                filter.addEventListener('change', function() {
+                    const rows = document.querySelectorAll('.block-row');
+                    const walletAddress = localStorage.getItem('walletAddress');
+                    
+                    if (this.value === 'mined' && walletAddress) {
+                        rows.forEach(row => {
+                            if (row.dataset.miner === walletAddress) {
+                                row.style.display = 'table-row';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    } else {
+                        rows.forEach(row => {
+                            row.style.display = 'table-row';
+                        });
+                    }
+                });
+            }
+        }
+
+        // Highlight newly mined blocks
+        function highlightNewBlock() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('new') === 'true') {
+                const firstRow = document.querySelector('.block-row');
+                if (firstRow) {
+                    firstRow.classList.add('new-block');
+                }
+            }
+        }
+        
+        // Call after page loads
+        document.addEventListener('DOMContentLoaded', highlightNewBlock);
     </script>
 </body>
 </html>
